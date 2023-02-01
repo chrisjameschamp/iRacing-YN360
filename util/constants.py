@@ -7,7 +7,7 @@ import uuid
 
 from util import functions
 
-VERSION = '0.1.1'
+VERSION = '0.0.2'
 
 class ir_yn360:
     def __init__(self):
