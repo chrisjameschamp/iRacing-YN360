@@ -11,8 +11,11 @@ nextPatchVersion = Version(VERSION)
 nextPatchVersion.patch += 1
 nextMinorVersion = Version(VERSION)
 nextMinorVersion.minor += 1
+nextMinorVersion.patch = 0
 nextMajorVersion = Version(VERSION)
 nextMajorVersion.major += 1
+nextMajorVersion.minor = 0
+nextMajorVersion.patch = 0
 
 print(f'The current version number is {curVersion}\n')
 print(f'  1) Major version: {nextMajorVersion}')

@@ -8,7 +8,7 @@ import uuid
 
 from util import functions
 
-VERSION = '1.1.2'
+VERSION = '1.2.0'
 
 class ir_yn360:
     def __init__(self):
@@ -64,6 +64,7 @@ class ir_yn360:
                         if self.flags['waiving'] != 'checkered':
                             print('Checkered Flag Waiving')
                             self.flags['waiving'] = 'checkered'
+                        if self.flags['waiving'] == 'checkered':
                             if self.current_color != [255,255,255]:
                                 await self.setColor([255,255,255])
                             else:
@@ -97,7 +98,7 @@ class ir_yn360:
                     elif 'white' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'white':
                             print('White Flag Waiving')
-                            self.flags['waiving'] != 'white'
+                            self.flags['waiving'] = 'white'
                         self.flags['flashing'] = ''
                         await self.setColor([255,255,255])
                     elif 'debris' in self.flags['active'].keys():
