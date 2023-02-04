@@ -8,8 +8,6 @@ __pycache__/
 
 # Exclude These
 build/
-compile.py
-git.py
 
 # Distribution / packaging
 .Python

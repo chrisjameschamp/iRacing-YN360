@@ -7,7 +7,7 @@ import uuid
 
 from util import functions
 
-VERSION = '0.0.2'
+VERSION = '0.1.1'
 
 class ir_yn360:
     def __init__(self):
@@ -15,8 +15,9 @@ class ir_yn360:
         self.ir_connected = False
         self.current_color = [0,0,0] #RGB 0-255
         self.rest_color = [0,0,255]
+        self.resting = False
         self.flags = {'bit': 0, 'active': {}, 'cycle': 1, 'flashing': '', 'waiving': ''}
-        self.flash_rate = 3
+        self.flash_rate = 1
 
     async def start(self):
         print('Welcome to iRacing YN360\n')
@@ -24,7 +25,7 @@ class ir_yn360:
         address = self.getAddress()
         device = functions.getDevice()
         if device:
-            user_input, timed_out = pytimedinput.timedKey(f'Existing Device Found - {device[1]}\nPress any key to select a new device or wait 5 seconds...')
+            user_input, timed_out = pytimedinput.timedKey(f'Existing Device Found - {device[0]}\nPress any key to select a new device or wait 5 seconds...')
             if not timed_out:
                 print('')
                 device = await self.scan()
@@ -35,9 +36,11 @@ class ir_yn360:
 
     
     async def run(self, device, address):
+        print('Connecting...')
         client = bleak.BleakClient(device[1])
         try:
             await client.connect()
+            print('Connected\n')
             while True:
                 if self.checkiRacing():
 
@@ -55,99 +58,109 @@ class ir_yn360:
                                     if flag[1] in self.flags['active'].keys():
                                         del self.flags['active'][flag[1]]
 
+                    self.resting = False
+
                     if 'checkered' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'checkered':
                             print('Checkered Flag Waiving')
-                            self.flags['waiving'] != 'checkered'
+                            self.flags['waiving'] = 'checkered'
                         if self.flags['flashing'] != 'checkered':
                             self.flags['cycle'] = self.flash_rate
                             self.flags['flashing'] = 'checkered'
                         if self.flags['cycle'] % self.flash_rate == 0:
                             if self.current_color != [255,255,255]:
-                                self.setColor([255,255,255], client, address)
+                                await self.setColor([255,255,255], client, address)
                             else:
-                                self.setColor([0,0,0], client, address)
+                                await self.setColor([0,0,0], client, address)
                     elif 'caution_waving' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'caution':
                             print('Caution Flag Waiving')
-                            self.flags['waiving'] != 'caution'
+                            self.flags['waiving'] = 'caution'
                         self.flags['flashing'] = ''
-                        self.setColor([255,255,0], client, address)
+                        await self.setColor([255,255,0], client, address)
                     elif 'yellow_waving' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'yellow':
                             print('Yellow Flag Waiving')
-                            self.flags['waiving'] != 'yellow'
+                            self.flags['waiving'] = 'yellow'
                         self.flags['flashing'] = ''
-                        self.setColor([255,255,0], client, address)
+                        await self.setColor([255,255,0], client, address)
                     elif 'start_go' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'green':
                             print('Green Flag Waiving')
-                            self.flags['waiving'] != 'green'
+                            self.flags['waiving'] = 'green'
                         self.flags['flashing'] = ''
-                        self.setColor([0,255,0], client, address)
+                        await self.setColor([0,255,0], client, address)
                     elif 'repair' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'repair':
                             print('Meatball Flag Waiving')
-                            self.flags['waiving'] != 'repair'
+                            self.flags['waiving'] = 'repair'
                         if self.flags['flashing'] != 'repair':
                             self.flags['cycle'] = self.flash_rate
                             self.flags['flashing'] = 'repair'
                         if self.flags['cycle'] % self.flash_rate == 0:
                             if self.current_color != [255,140,0]:
-                                self.setColor([255,140,0], client, address)
+                                await self.setColor([255,140,0], client, address)
                             else:
-                                self.setColor([0,0,0], client, address)
+                                await self.setColor([0,0,0], client, address)
                     elif 'white' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'white':
                             print('White Flag Waiving')
                             self.flags['waiving'] != 'white'
                         self.flags['flashing'] = ''
-                        self.setColor([255,255,255], client, address)
-                        self.flags['flashing'] = ''
+                        await self.setColor([255,255,255], client, address)
                     elif 'debris' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'yellow':
                             print('Yellow Flag Waiving')
-                            self.flags['waiving'] != 'yellow'
+                            self.flags['waiving'] = 'yellow'
                         self.flags['flashing'] = ''
-                        self.setColor([255,255,0], client, address)
+                        await self.setColor([255,255,0], client, address)
                     elif 'green' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'green':
                             print('Green Flag Waiving')
-                            self.flags['waiving'] != 'green'
+                            self.flags['waiving'] = 'green'
                         self.flags['flashing'] = ''
-                        self.setColor([0,255,0], client, address)
+                        await self.setColor([0,255,0], client, address)
                     elif 'red' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'red':
                             print('Red Flag Waiving')
-                            self.flags['waiving'] != 'red'
+                            self.flags['waiving'] = 'red'
                         self.flags['flashing'] = ''
-                        self.setColor([255,0,0], client, address)
+                        await self.setColor([255,0,0], client, address)
                     elif 'caution' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'caution':
                             print('Caution Flag Waiving')
-                            self.flags['waiving'] != 'caution'
+                            self.flags['waiving'] = 'caution'
                         self.flags['flashing'] = ''
-                        self.setColor([255,255,0], client, address)
+                        await self.setColor([255,255,0], client, address)
                     elif 'yellow' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'yellow':
                             print('Yellow Flag Waiving')
-                            self.flags['waiving'] != 'yellow'
+                            self.flags['waiving'] = 'yellow'
                         self.flags['flashing'] = ''
-                        self.setColor([255,255,0], client, address)
+                        await self.setColor([255,255,0], client, address)
                     elif 'blue' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'blue':
                             print('Blue Flag Waiving')
-                            self.flags['waiving'] != 'blue'
+                            self.flags['waiving'] = 'blue'
                         self.flags['flashing'] = ''
-                        self.setColor([0,0,255], client, address)
+                        await self.setColor([0,0,255], client, address)
                     else:
-                        self.flags['waiving'] = ''
+                        if self.flags['waiving'] != '':
+                            await self.setColor(self.rest_color, client, address)
+                            print('Set to Resting Color')
+                            self.flags['waiving'] = ''
                             
                     self.flags['cycle'] += 1
                     await asyncio.sleep(1)
                 else:
-                    self.setColor(self.rest_color, client, address)
+                    if not self.resting:
+                        await self.setColor(self.rest_color, client, address)
+                        print('Set to Resting Color')
+                        self.resting = True
                     await asyncio.sleep(3)
+        except KeyboardInterrupt:
+            await self.setColor([0,0,0], client, address)
+            print('Disconnecting...')
         except Exception as e:
             print(f'Error: {e}')
         finally:
@@ -203,7 +216,8 @@ class ir_yn360:
 
     async def setColor(self, color, client, address):
         if color != self.current_color:
-            await client.write_gatt_char(address, bytearray([0xae,0xa1,color[0],color[1],color[2]]), response=True)
+            sendCharUuid = 'f000aa61-0451-4000-b000-000000000000'
+            await client.write_gatt_char(sendCharUuid, bytearray([0xae,0xa1,color[0],color[1],color[2]]), response=True)
             self.current_color = color
 
     def checkiRacing(self):
