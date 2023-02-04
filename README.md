@@ -49,7 +49,7 @@ To change the Bluetooth device, launch **iRacing-YN360** and press any key when 
 
 When you're done racing, exit iRacing-YN360 by pressing "CTRL + C" on your keyboard with the iRacing-YN360 window selected. The connection to the YN360 will then be disconnected and iRacing-YN360 will close.
 
-**Thats It!**
+**Thats It!!**
 
 ## 
 <div align="center">
