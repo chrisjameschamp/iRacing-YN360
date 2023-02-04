@@ -17,9 +17,9 @@ def ensureAppDataFolder():
 
         try:
             os.makedirs(folder)
-            print('Created App Data Folder\n')
+            print('Created App Data Folder')
         except:
-            print('Could not open the App Data Folder\n')
+            print('Could not open the App Data Folder')
             closeApp()
 
     else:
@@ -35,10 +35,10 @@ def getDevice():
     try:
         with open(f'{APPDATA_FOLDER}/device.json') as infile:
             data = json.load(infile)
-        print('Loaded Existing Device\n')
+        print('Loaded Existing Device')
         return data
     except:
-        print('No Existing Device Found\n')
+        print('No Existing Device Found')
         return None
 
 def saveDevice(device):
@@ -62,10 +62,10 @@ def checkVersion(version):
         curVersion = Version(version)
 
         if gitVersion > curVersion:
-            print(f'There is a new version of iRacing-YN360 available\nThe Most recent version is {gitVersion}')
-            print('Get the latest version by visiting https://github.com/chrisjameschamp/iRacing-YN360\n')
+            print(f'There is a new version of iRacing-YN360 availableThe Most recent version is {gitVersion}')
+            print('Get the latest version by visiting https://github.com/chrisjameschamp/iRacing-YN360')
         else:
-            print('You are up to date\n')
+            print('You are up to date')
 
     else:
         print('Error Checking for Updates')

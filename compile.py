@@ -1,10 +1,10 @@
 import subprocess
 
-from util import constants, dialogue
+from iryn360 import VERSION
 
-print('Compiling TwitchTube\n')
+print('Compiling iRacing-YN360\n')
 
-command = f'pyinstaller build/TwitchTube.spec --distpath dist/{constants.VERSION}/TwitchTube-MacOS-{constants.VERSION}'
+command = f'pyinstaller iryn360.spec --distpath dist/{VERSION}/'
 
 process = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE,  stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
 for line in process.stdout:
