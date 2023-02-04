@@ -8,15 +8,17 @@
   ![Github repo top lang](https://img.shields.io/github/languages/top/chrisjameschamp/iRacing-YN360?style=flat-square)
   ![GitHub license](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)
   ![GitHub last commit](https://img.shields.io/github/last-commit/chrisjameschamp/iRacing-YN360?style=flat-square)
+  ![GitHub downloads](https://img.shields.io/github/downloads/chrisjameschamp/iRacing-YN360/total?style=flat-square)
+  ![GitHub release](https://img.shields.io/github/v/release/chrisjameschamp/iRacing-YN360?style=flat-square&display_name=tag)
   
 </div>
 
 ## Index
 
-* [iRacing-YN360](#iRacing-YN360)
+* [iRacing-YN360](#iracing-yn360)
 * [Download](#download)
 * [Overview](#overview)
-* [Requirements](#Requirements)
+* [Requirements](#requirements)
 * [Usage](#usage)
   * [Change Device](#change-device)
   * [Closing](#closing)  
