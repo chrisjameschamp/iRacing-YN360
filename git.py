@@ -50,7 +50,7 @@ for i, line in enumerate(content):
     if line.casefold().startswith('version'):
         content[i] = f"VERSION = '{version}'\n"
 
-with open('util/constants.py', 'w') as file:
+with open('iryn360.py', 'w') as file:
     file.writelines(content)
 
 # Update Poetry Project Version
