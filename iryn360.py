@@ -7,14 +7,15 @@ import sys
 
 from util import functions, colargulog
 
-VERSION = '1.3.0'
+VERSION = '1.3.1'
 
 # SETUP LOG LEVEL - DEBUG: debug message | INFO: info message | WARNING: warn message | ERROR: error message
 console_handler = logging.StreamHandler(stream=sys.stdout)
 colored_formatter = colargulog.ColorizedArgsFormatter("%(asctime)s - %(levelname)-8s - %(name)-25s - %(message)s")
 console_handler.setFormatter(colored_formatter)
 logging.getLogger().setLevel(logging.INFO)
-logger = logging.getLogger('iryn360')
+logger = logging.getLogger()
+logger.name = 'iRacing-YN360'
 logger.addHandler(console_handler)
 
 class ir_yn360:
