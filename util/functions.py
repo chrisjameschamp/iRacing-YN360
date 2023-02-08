@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import requests
 import sys
@@ -8,26 +9,27 @@ from appdirs import *
 
 APPDATA_FOLDER = user_data_dir('iRacing-YN360', 'ChrisJamesChamp')
 
+logger = logging.getLogger(__name__)
+
 def ensureAppDataFolder():
     folder = APPDATA_FOLDER
     #print('Ensuring App Data Folder Exists')
     if not os.path.exists(folder):
-        print('App Data Folder Does Not Exist')
-        print('Creating App Data Folder...')
+        logger.warning('App Data Folder Does Not Exist')
+        logger.info('Creating App Data Folder...')
 
         try:
             os.makedirs(folder)
-            print('Created App Data Folder')
+            logger.info('Created App Data Folder')
         except:
-            print('Could not open the App Data Folder')
+            logger.error('Could not open the App Data Folder')
             closeApp()
 
     else:
-        #print(f'App Data Folder Exists: {folder}')
-        pass
+        logger.debug('App Data Folder Exists: {}', folder)
 
 def closeApp():
-    print('Exiting...')
+    logger.info('Exiting...')
     sys.exit();
 
 def getDevice():
@@ -35,25 +37,25 @@ def getDevice():
     try:
         with open(f'{APPDATA_FOLDER}/device.json') as infile:
             data = json.load(infile)
-        print('Loaded Existing Device')
+        logger.info('Loaded Existing Device')
         return data
     except:
-        print('No Existing Device Found')
+        logger.warning('No Existing Device Found')
         return None
 
 def saveDevice(device):
     ensureAppDataFolder()
-    print('Saving Device...')
+    logger.info('Saving Device...')
     try:
         with open(f'{APPDATA_FOLDER}/device.json', 'w') as outfile:
             json.dump(device, outfile)
-        print('Device Saved')
+        logger.info('Device Saved')
     except Exception as e:
-        print(f'Warning: Could Not Save Device. Error: {e}')
+        logger.error('Could Not Save Device | {}', e)
 
 def checkVersion(version):
-    print(f'Version: {version}')
-    print('Checking for Updates...')
+    logger.info('Version: {}', version)
+    logger.info('Checking for Updates...')
     
     url = 'https://api.github.com/repos/chrisjameschamp/iRacing-YN360/releases/latest'
     response = requests.get(url).json()
@@ -62,13 +64,13 @@ def checkVersion(version):
         curVersion = Version(version)
 
         if gitVersion > curVersion:
-            print(f'There is a new version of iRacing-YN360 availableThe Most recent version is {gitVersion}')
-            print('Get the latest version by visiting https://github.com/chrisjameschamp/iRacing-YN360')
+            logger.info('There is a new version of iRacing-YN360 availableThe Most recent version is {}', gitVersion)
+            logger.info('Get the latest version by visiting https://github.com/chrisjameschamp/iRacing-YN360')
         else:
-            print('You are up to date')
+            logger.info('You are up to date')
 
     else:
-        print('Error Checking for Updates')
+        logger.error('Error Checking for Updates')
 
 FLAGS = [
     ## Global Flags

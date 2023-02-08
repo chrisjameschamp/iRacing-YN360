@@ -3,12 +3,19 @@ import bleak
 import irsdk
 import logging
 import pytimedinput
-import re
-import uuid
+import sys
 
-from util import functions
+from util import functions, colargulog
 
-VERSION = '1.2.0'
+VERSION = '1.3.0'
+
+# SETUP LOG LEVEL - DEBUG: debug message | INFO: info message | WARNING: warn message | ERROR: error message
+console_handler = logging.StreamHandler(stream=sys.stdout)
+colored_formatter = colargulog.ColorizedArgsFormatter("%(asctime)s - %(levelname)-8s - %(name)-25s - %(message)s")
+console_handler.setFormatter(colored_formatter)
+logging.getLogger().setLevel(logging.INFO)
+logger = logging.getLogger('iryn360')
+logger.addHandler(console_handler)
 
 class ir_yn360:
     def __init__(self):
@@ -20,22 +27,23 @@ class ir_yn360:
         self.flags = {'bit': 0, 'active': {}, 'waiving': ''}
 
     async def start(self):
-        print('Welcome to iRacing YN360')
+        logger.info('Welcome to iRacing YN360')
         functions.checkVersion(VERSION)
         device = functions.getDevice()
         if device:
-            user_input, timed_out = pytimedinput.timedKey(f'Existing Device Found - {device[0]}\nPress any key to select a new device or wait 5 seconds...')
+            logger.info('Existing Device Found - {}', device[0])
+            logger.info('Press any key to select a new device or wait 5 seconds...')
+            user_input, timed_out = pytimedinput.timedKey('>>>')
             if not timed_out:
-                print('')
                 device = await self.scan()
         else:
             device = await self.scan()
-
         await self.run(device)
 
     async def setColor(self, color):
         if color != self.current_color:
             sendCharUuid = 'f000aa61-0451-4000-b000-000000000000'
+            logger.debug('Color Change Sent: R{}, G{}, B{}', color[0], color[1], color[2])
             await self.client.write_gatt_char(sendCharUuid, bytearray([0xae,0xa1,color[0],color[1],color[2]]), response=True)
             self.current_color = color
 
@@ -62,7 +70,7 @@ class ir_yn360:
 
                     if 'checkered' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'checkered':
-                            print('Checkered Flag Waiving')
+                            logger.info('Checkered Flag Waiving')
                             self.flags['waiving'] = 'checkered'
                         if self.flags['waiving'] == 'checkered':
                             if self.current_color != [255,255,255]:
@@ -71,25 +79,25 @@ class ir_yn360:
                                 await self.setColor([0,0,0])
                     elif 'caution_waving' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'caution':
-                            print('Caution Flag Waiving')
+                            logger.info('Caution Flag Waiving')
                             self.flags['waiving'] = 'caution'
                         self.flags['flashing'] = ''
                         await self.setColor([255,255,0])
                     elif 'yellow_waving' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'yellow':
-                            print('Yellow Flag Waiving')
+                            logger.info('Yellow Flag Waiving')
                             self.flags['waiving'] = 'yellow'
                         self.flags['flashing'] = ''
                         await self.setColor([255,255,0])
                     elif 'start_go' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'green':
-                            print('Green Flag Waiving')
+                            logger.info('Green Flag Waiving')
                             self.flags['waiving'] = 'green'
                         self.flags['flashing'] = ''
                         await self.setColor([0,255,0])
                     elif 'repair' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'repair':
-                            print('Meatball Flag Waiving')
+                            logger.info('Meatball Flag Waiving')
                             self.flags['waiving'] = 'repair'
                         if self.current_color != [255,140,0]:
                             await self.setColor([255,140,0])
@@ -97,98 +105,98 @@ class ir_yn360:
                             await self.setColor([0,0,0])
                     elif 'white' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'white':
-                            print('White Flag Waiving')
+                            logger.info('White Flag Waiving')
                             self.flags['waiving'] = 'white'
                         self.flags['flashing'] = ''
                         await self.setColor([255,255,255])
                     elif 'debris' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'yellow':
-                            print('Yellow Flag Waiving')
+                            logger.info('Yellow Flag Waiving')
                             self.flags['waiving'] = 'yellow'
                         self.flags['flashing'] = ''
                         await self.setColor([255,255,0])
                     elif 'green' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'green':
-                            print('Green Flag Waiving')
+                            logger.info('Green Flag Waiving')
                             self.flags['waiving'] = 'green'
                         self.flags['flashing'] = ''
                         await self.setColor([0,255,0])
                     elif 'red' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'red':
-                            print('Red Flag Waiving')
+                            logger.info('Red Flag Waiving')
                             self.flags['waiving'] = 'red'
                         self.flags['flashing'] = ''
                         await self.setColor([255,0,0])
                     elif 'caution' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'caution':
-                            print('Caution Flag Waiving')
+                            logger.info('Caution Flag Waiving')
                             self.flags['waiving'] = 'caution'
                         self.flags['flashing'] = ''
                         await self.setColor([255,255,0])
                     elif 'yellow' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'yellow':
-                            print('Yellow Flag Waiving')
+                            logger.info('Yellow Flag Waiving')
                             self.flags['waiving'] = 'yellow'
                         self.flags['flashing'] = ''
                         await self.setColor([255,255,0])
                     elif 'blue' in self.flags['active'].keys():
                         if self.flags['waiving'] != 'blue':
-                            print('Blue Flag Waiving')
+                            logger.info('Blue Flag Waiving')
                             self.flags['waiving'] = 'blue'
                         self.flags['flashing'] = ''
                         await self.setColor([0,0,255])
                     else:
                         if self.flags['waiving'] != '':
                             await self.setColor(self.rest_color)
-                            print('Set to Resting Color')
+                            logger.info('Set to Resting Color')
                             self.flags['waiving'] = ''
                     await asyncio.sleep(1)
                 else:
                     if self.status != 'waiting':
                         await self.setColor(self.rest_color)
-                        print('Waiting for iRacing...')
-                        print('Light set to resting color')
-                        print('Press CTRL + C to exit')
+                        logger.info('Waiting for iRacing...')
+                        logger.info('Light set to resting color')
+                        logger.info('Press CTRL + C to exit')
                         self.status = 'waiting'
                     await asyncio.sleep(3)
 
     async def connect(self, device):
-        print('Connecting...')
+        logger.info('Connecting...')
         self.client = bleak.BleakClient(device[1])
         try:
             await self.client.connect()
             self.status = 'connected'
-            print('Connected')
+            logger.info('Connected')
             return True
         except:
-            print('Error: Could not connect to device')
+            logger.error('Could not connect to device')
             return False
 
     async def disconnect(self):
         if self.status != 'disconnected':
-            print('Disconnecting...')
+            logger.info('Disconnecting...')
             if self.status == 'racing':
                 self.ir.shutdown()
-                print('iRacing Disconnected')
+                logger.info('iRacing Disconnected')
             try:
                 await self.setColor([0,0,0])
                 await self.client.disconnect()
                 self.status = 'disconnected'
-                print('Disconnected')
+                logger.info('Disconnected')
                 return True
             except:
-                print('Error: Could not disconnect from device')
+                logger.error('Could not disconnect from device')
                 return False
 
     def checkiRacing(self):
         if self.status == 'racing' and not (self.ir.is_initialized and self.ir.is_connected):
             self.status = 'waiting'
             self.ir.shutdown()
-            print('iRacing Disconnected')
+            logger.info('iRacing Disconnected')
             return False
         elif self.status == 'waiting' and self.ir.startup() and self.ir.is_initialized and self.ir.is_connected:
             self.status = 'racing'
-            print('iRacing Connected')
+            logger.info('iRacing Connected')
             return True
         elif self.status =='racing':
             return True
@@ -196,14 +204,14 @@ class ir_yn360:
             return False
 
     async def scan(self):
-        print('Scanning for BLE Devices...')
+        logger.info('Scanning for BLE Devices...')
         try:
             devices = await bleak.BleakScanner.discover()
         except Exception as e:
-            print(f'Error: {e}')
+            logger.error('{}', e)
             function.closeApp()
         if not devices:
-            print('No BLE devices found')
+            logger.info('No BLE devices found')
             function.closeApp()
         names = []
         for i, item in enumerate(devices):
@@ -213,24 +221,24 @@ class ir_yn360:
             device = ':'.join(device)
             if name != 'None':
                 names.append([name, device])
-        print(f'Found {len(names)}')
+        logger.info('Found {}', len(names))
         for i, item in enumerate(names, start=1):
-            print(f'  {i}) {item[0]}')
+            logger.info('  {}) {}', i, item[0])
         while True:
-            print('Select the corresponding number next to the YN360.  All other devices may not work.')
+            logger.info('Select the corresponding number next to the YN360.  All other devices may not work.')
             user_input = input('>>> ')
             try:
                 value = int(user_input)
                 if value >= 1 and value <= len(names):
                     device = names[int(user_input)-1]
-                    print(f'You chose: {device[0]}')
-                    print('Confirm Y/N?')
+                    logger.info('You chose: {}', device[0])
+                    logger.info('Confirm Y/N?')
                     if input('>>> ').lower() == 'y':
                         break
                 else:
-                    print(f'Invalid input, please enter a number between 1 and {len(names)}')
+                    logger.info('Invalid input, please enter a number between {} and {}', '1', len(names))
             except ValueError:
-                print(f'Invalid input, please enter a number between 1 and {len(names)}')
+                logger.info('Invalid input, please enter a number between {} and {}', 1, len(names))
         functions.saveDevice(device)
         return device
 
@@ -240,9 +248,9 @@ if __name__ == '__main__':
     try:
         loop.run_until_complete(ir.start())
     except Exception as e:
-        print(f'Error: {e}')
+        logger.error('{}', e)
     except KeyboardInterrupt as e:
-        print('Exiting...')
+        logger.info('Exiting...')
     finally:
         loop.run_until_complete(ir.disconnect())
         loop.close()
