@@ -7,7 +7,7 @@ import sys
 
 from util import functions, colargulog
 
-VERSION = '1.3.3'
+VERSION = '1.3.4'
 
 DEBUG = False
 
