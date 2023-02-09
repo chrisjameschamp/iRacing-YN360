@@ -2,9 +2,9 @@ import logging
 import logging.handlers
 import re
 
-
 class ColorCodes:
-    grey = "\x1b[38;21m"
+    white = "\x1b[38;21m"
+    grey = "\x1b[2m"
     green = "\x1b[1;32m"
     yellow = "\x1b[33;21m"
     red = "\x1b[31;21m"
@@ -19,24 +19,35 @@ class ColorizedArgsFormatter(logging.Formatter):
     arg_colors = [ColorCodes.purple, ColorCodes.light_blue]
     level_fields = ["levelname", "levelno"]
     level_to_color = {
-        logging.DEBUG: ColorCodes.grey,
+        logging.DEBUG: ColorCodes.white,
         logging.INFO: ColorCodes.green,
         logging.WARNING: ColorCodes.yellow,
         logging.ERROR: ColorCodes.red,
         logging.CRITICAL: ColorCodes.bold_red,
     }
+    level_names = {
+        logging.DEBUG: "DBUG",
+        logging.INFO: "INFO",
+        logging.WARNING: "WARN",
+        logging.ERROR: "ERRR",
+        logging.CRITICAL: "CRIT"
+    }
 
-    def __init__(self, fmt: str):
+    def __init__(self, fmt: str, datefmt=None):
         super().__init__()
         self.level_to_formatter = {}
 
         def add_color_format(level: int):
             color = ColorizedArgsFormatter.level_to_color[level]
             _format = fmt
+            _format = _format.replace("%(asctime)s", ColorCodes.grey + "%(asctime)s" + ColorCodes.reset)
             for fld in ColorizedArgsFormatter.level_fields:
                 search = "(%\(" + fld + "\).*?s)"
                 _format = re.sub(search, f"{color}\\1{ColorCodes.reset}", _format)
-            formatter = logging.Formatter(_format)
+            if datefmt:
+                formatter = logging.Formatter(_format, datefmt=datefmt)
+            else:
+                formatter = logging.Formatter(_format)
             self.level_to_formatter[level] = formatter
 
         add_color_format(logging.DEBUG)
@@ -71,6 +82,7 @@ class ColorizedArgsFormatter(logging.Formatter):
     def format(self, record):
         orig_msg = record.msg
         orig_args = record.args
+        record.levelname = self.level_names.get(record.levelno, record.levelname)
         formatter = self.level_to_formatter.get(record.levelno)
         self.rewrite_record(record)
         formatted = formatter.format(record)
@@ -117,7 +129,7 @@ class BraceFormatStyleFormatter(logging.Formatter):
         orig_args = record.args
         self.rewrite_record(record)
         formatted = self.formatter.format(record)
-
+        
         # restore log record to original state for other handlers
         record.msg = orig_msg
         record.args = orig_args
