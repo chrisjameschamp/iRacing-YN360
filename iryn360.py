@@ -7,7 +7,7 @@ import sys
 
 from util import functions, colargulog
 
-VERSION = '1.3.2'
+VERSION = '1.3.3'
 
 DEBUG = False
 
@@ -246,10 +246,14 @@ if __name__ == '__main__':
         colored_formatter = colargulog.ColorizedArgsFormatter('%(asctime)s [%(levelname)s] %(name)-25s - %(message)s')
     else:
         colored_formatter = colargulog.ColorizedArgsFormatter('%(asctime)s [%(levelname)s] - %(message)s', '%H:%M:%S')
+    console_handler.setFormatter(colored_formatter)
     logging.getLogger().setLevel(logging.INFO)
     logger = logging.getLogger()
     logger.name = 'iRacing-YN360'
     logger.addHandler(console_handler)
+    if DEBUG:
+        logging.getLogger().setLevel(logging.DEBUG)
+        logger.debug('-------------------DEBUG ACTIVE-------------------')
 
     loop = asyncio.new_event_loop()
     ir = ir_yn360()
